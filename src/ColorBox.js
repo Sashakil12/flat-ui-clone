@@ -1,6 +1,7 @@
 import React from "react";
 import "./ColorBox.css";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+
 class ColorBox extends React.Component {
   constructor(props) {
     super(props);
@@ -15,17 +16,18 @@ class ColorBox extends React.Component {
     });
   }
   render() {
-    const { color, name } = this.props;
+    const { hex, name } = this.props;
+
     return (
-      <CopyToClipboard text={color} onCopy={this.handleCopy}>
-        <div style={{ backgroundColor: color }} className="ColorBox">
+      <CopyToClipboard text={hex} onCopy={this.handleCopy}>
+        <div style={{ backgroundColor: hex }} className="ColorBox">
           <div
-            style={{ backgroundColor: color }}
+            style={{ backgroundColor: hex }}
             className={`copy-overlay ${this.state.copied && "show"}`}
           ></div>
           <div className={`copy-msg ${this.state.copied && "show"}`}>
             <h1>copied!</h1>
-            <p>{color}</p>
+            <p>{hex}</p>
           </div>
           <div className="copy-container">
             <div className="box-content">
