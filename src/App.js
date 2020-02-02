@@ -4,7 +4,7 @@ import SeedColors from "./seedColors";
 function App() {
   return (
     <div>
-      <Pallette />
+      <Pallette {...SeedColors[5]} />
     </div>
   );
 }
