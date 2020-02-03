@@ -1,6 +1,6 @@
 import React from "react";
 import "./navbar.css";
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 import Slider, { Range } from "rc-slider";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -31,20 +31,22 @@ class Navbar extends React.Component {
     return (
       <header className="Navbar">
         <div className="logo">
-          <Link to='/'>Better UI Colors</Link>
+          <Link to="/">Better UI Colors</Link>
         </div>
-        <div className="slider-container">
-          <span>Level {this.props.level}</span>
-          <div className="slider">
-            <Slider
-              defaultValue={this.props.level}
-              min={100}
-              max={900}
-              step={100}
-              onAfterChange={this.props.changeLevel}
-            />
+        {this.props.slider && (
+          <div className="slider-container">
+            <span>Level {this.props.level}</span>
+            <div className="slider">
+              <Slider
+                defaultValue={this.props.level}
+                min={100}
+                max={900}
+                step={100}
+                onAfterChange={this.props.changeLevel}
+              />
+            </div>
           </div>
-        </div>
+        )}
         <div className="select-container">
           <Select
             name="color"

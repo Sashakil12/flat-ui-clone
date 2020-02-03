@@ -1,6 +1,7 @@
 import React from "react";
 import ColorBox from "./ColorBox";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 import "rc-slider/assets/index.css";
 import "./palette.css";
 
@@ -22,6 +23,7 @@ class Pallette extends React.Component {
       this.state.level
     ].map(color => (
       <ColorBox
+        showLink
         key={color.id}
         colorId={color.id}
         color={color[this.state.colorMode]}
@@ -32,15 +34,16 @@ class Pallette extends React.Component {
     return (
       <div className="Palette">
         <Navbar
+          slider
           changeLevel={this.changeLevel}
           handleChange={this.handleChange}
           level={this.state.level}
         />
         <div className="Palette-colors">{ColorBoxes}</div>
-        <footer className="palette-footer">
-          {this.props.palette.paletteName}
-          <span className="emoji"> {this.props.palette.emoji}</span>
-        </footer>
+        <Footer
+          paletteName={this.props.palette.paletteName}
+          emoji={this.props.palette.emoji}
+        />
       </div>
     );
   }

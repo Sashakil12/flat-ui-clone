@@ -2,13 +2,15 @@ import React, { Fragment } from "react";
 import Pallette from "./Pallette";
 import SeedColors from "./seedColors";
 import PaletteList from "./PaletteList";
-import SingleColorComponent from "./SingleColorComponent";
+import SingleColorPalette from "./SingleColorComponent";
 import generatePalette from "./colorHelper";
 import { Route, Switch } from "react-router-dom";
 
 function App() {
   function findPalette(id) {
-    return SeedColors.find(pal => pal.id === id);
+    return SeedColors.find(pal => {
+      return pal.id === id;
+    });
   }
   return (
     <Switch>
@@ -29,8 +31,15 @@ function App() {
       />
       <Route
         exact
-        path-="/palette/:paletteId/:colorId"
-        render={() => <SingleColorComponent />}
+        path="/palette/:paletteId/:colorId"
+        render={routeProps => (
+          <SingleColorPalette
+            colorId={routeProps.match.params.colorId}
+            palette={generatePalette(
+              findPalette(routeProps.match.params.paletteId)
+            )}
+          />
+        )}
       />
     </Switch>
   );
