@@ -23,8 +23,10 @@ class Pallette extends React.Component {
     ].map(color => (
       <ColorBox
         key={color.id}
+        colorId={color.id}
         color={color[this.state.colorMode]}
         name={color.name}
+        paletteId={this.props.palette.id}
       />
     ));
     return (

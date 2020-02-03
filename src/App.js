@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import Pallette from "./Pallette";
 import SeedColors from "./seedColors";
 import PaletteList from "./PaletteList";
+import SingleColorComponent from "./SingleColorComponent";
 import generatePalette from "./colorHelper";
 import { Route, Switch } from "react-router-dom";
 
@@ -25,6 +26,11 @@ function App() {
             palette={generatePalette(findPalette(routeProps.match.params.id))}
           />
         )}
+      />
+      <Route
+        exact
+        path-="/palette/:paletteId/:colorId"
+        render={() => <SingleColorComponent />}
       />
     </Switch>
   );
