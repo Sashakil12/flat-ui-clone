@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function NewPaletteForm() {
+export default function NewPaletteForm({ savePalette, history }) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -102,10 +102,21 @@ export default function NewPaletteForm() {
     setColors([...colors, newColor]);
     setName("");
   };
+  const handleSave = () => {
+    const newPaletteName = "New-palette";
+    const newPalette = {
+      paletteName: newPaletteName,
+      id: newPaletteName.toLowerCase().replace(/ /g, "-"),
+      colors: colors
+    };
+    savePalette(newPalette);
+    history.push("/");
+  };
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
+        color="default"
         position="fixed"
         className={clsx(classes.appBar, {
           [classes.appBarShift]: open
@@ -115,6 +126,9 @@ export default function NewPaletteForm() {
           <Typography variant="h6" noWrap className={classes.title}>
             Add new color
           </Typography>
+          <Button variant="contained" onClick={handleSave}>
+            Save Palette
+          </Button>
           <IconButton
             color="inherit"
             aria-label="open drawer"
