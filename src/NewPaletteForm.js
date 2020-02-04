@@ -14,9 +14,9 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { ChromePicker } from "react-color";
 import Button from "@material-ui/core/Button";
-import chroma from "chroma-js";
 import DragColorBox from "./DrgColorBox";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import SavePaletteDialogue from "./SavePalette";
 const drawerWidth = 500;
 
 const useStyles = makeStyles(theme => ({
@@ -82,13 +82,14 @@ export default function NewPaletteForm({ savePalette, history }) {
   const [open, setOpen] = React.useState(false);
   const [currentColor, setCurrentColor] = React.useState("#000");
   const [colors, setColors] = React.useState([]);
-  const [newName, setName] = React.useState("");
+  const [newColorName, setName] = React.useState("");
+  const [newPaletteName, setPaletteName] = React.useState("");
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleNameChange = e => {
     setName(e.target.value);
-    console.log(newName);
+    console.log(newColorName);
   };
   const handleDrawerClose = () => {
     setOpen(false);
@@ -96,22 +97,27 @@ export default function NewPaletteForm({ savePalette, history }) {
   const handleColorChange = color => {
     setCurrentColor(color.hex);
   };
-
+  const handlePaletteNameInput = value => {
+    setPaletteName(value);
+  };
   const addColor = color => {
-    const newColor = { color, name: newName };
+    const newColor = { color, name: newColorName };
     setColors([...colors, newColor]);
     setName("");
   };
   const handleSave = () => {
-    const newPaletteName = "New-palette";
+    const paletteName = newPaletteName;
     const newPalette = {
-      paletteName: newPaletteName,
-      id: newPaletteName.toLowerCase().replace(/ /g, "-"),
+      paletteName: paletteName,
+      id: paletteName.toLowerCase().replace(/ /g, "-"),
       colors: colors
     };
     savePalette(newPalette);
     history.push("/");
   };
+  const handleDelete = (val) => {
+    setColors([...colors.filter(color=>color.color!==val)])
+  }
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -126,9 +132,11 @@ export default function NewPaletteForm({ savePalette, history }) {
           <Typography variant="h6" noWrap className={classes.title}>
             Add new color
           </Typography>
-          <Button variant="contained" onClick={handleSave}>
-            Save Palette
-          </Button>
+          <SavePaletteDialogue
+            handleSave={handleSave}
+            paletteNameInput={handlePaletteNameInput}
+            paletteName={newPaletteName}
+          />
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -148,7 +156,7 @@ export default function NewPaletteForm({ savePalette, history }) {
         <div className={classes.drawerHeader} />
 
         {colors.map(col => (
-          <DragColorBox key={`${col}-${Math.random() * 5}`} {...col} />
+          <DragColorBox key={`${col}-${Math.random() * 5}`} {...col} handleDelete={handleDelete} />
         ))}
       </main>
       <Drawer
@@ -186,7 +194,7 @@ export default function NewPaletteForm({ savePalette, history }) {
         <ValidatorForm onSubmit={() => addColor(currentColor)}>
           <TextValidator
             label="Color Name"
-            value={newName}
+            value={newColorName}
             onChange={handleNameChange}
             validators={["required"]}
             errorMessages={["name is required"]}
