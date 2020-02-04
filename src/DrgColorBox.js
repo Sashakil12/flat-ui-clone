@@ -11,10 +11,10 @@ const styles = {
     marginBottom: "-3.8px"
   }
 };
-function DragColorComp({ color, classes }) {
+function DragColorComp({ color, classes, name }) {
   return (
     <div style={{ backgroundColor: color }} className={classes.root}>
-      {color}
+      {name}
     </div>
   );
 }

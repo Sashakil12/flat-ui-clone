@@ -16,6 +16,7 @@ import { ChromePicker } from "react-color";
 import Button from "@material-ui/core/Button";
 import chroma from "chroma-js";
 import DragColorBox from "./DrgColorBox";
+import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 const drawerWidth = 500;
 
 const useStyles = makeStyles(theme => ({
@@ -81,18 +82,25 @@ export default function NewPaletteForm() {
   const [open, setOpen] = React.useState(false);
   const [currentColor, setCurrentColor] = React.useState("#000");
   const [colors, setColors] = React.useState([]);
+  const [newName, setName] = React.useState("");
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
+  const handleNameChange = e => {
+    setName(e.target.value);
+    console.log(newName);
+  };
   const handleDrawerClose = () => {
     setOpen(false);
   };
   const handleColorChange = color => {
     setCurrentColor(color.hex);
   };
+
   const addColor = color => {
-    setColors([...colors, color]);
+    const newColor = { color, name: newName };
+    setColors([...colors, newColor]);
+    setName("");
   };
   return (
     <div className={classes.root}>
@@ -126,7 +134,7 @@ export default function NewPaletteForm() {
         <div className={classes.drawerHeader} />
 
         {colors.map(col => (
-          <DragColorBox key={`${col}-${Math.random() * 5}`} color={col} />
+          <DragColorBox key={`${col}-${Math.random() * 5}`} {...col} />
         ))}
       </main>
       <Drawer
@@ -161,14 +169,24 @@ export default function NewPaletteForm() {
           color={currentColor}
           onChange={newColor => handleColorChange(newColor)}
         />
-        <Button
-          variant="contained"
-          color="secondary"
-          style={{ backgroundColor: currentColor }}
-          onClick={() => addColor(currentColor)}
-        >
-          Add Color
-        </Button>
+        <ValidatorForm onSubmit={() => addColor(currentColor)}>
+          <TextValidator
+            label="Color Name"
+            value={newName}
+            onChange={handleNameChange}
+            validators={["required"]}
+            errorMessages={["name is required"]}
+          />
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            style={{ backgroundColor: currentColor }}
+          >
+            Add Color
+          </Button>
+        </ValidatorForm>
+
         <Divider />
       </Drawer>
     </div>
