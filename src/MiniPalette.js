@@ -1,5 +1,6 @@
 import React from "react";
 import { withStyles } from "@material-ui/styles";
+import DeletePaletteDialogue from "./DeletePaletteDialogue";
 
 const styles = {
   root: {
@@ -44,7 +45,7 @@ const styles = {
   }
 };
 function MiniPalette(props) {
-  const { classes, paletteName, emoji, colors } = props;
+  const { classes, paletteName, emoji, colors, id } = props;
   const miniColorBoxes = colors.map(col => (
     <div
       key={col.name}
@@ -54,6 +55,10 @@ function MiniPalette(props) {
   ));
   return (
     <div className={classes.root} onClick={props.handleClick}>
+      <div className={classes.delBtn}>
+        <DeletePaletteDialogue deletePalette={props.deletePalette} id={id} />
+      </div>
+
       <div className={classes.colors}>{miniColorBoxes}</div>
       <h5 className={classes.title}>
         {paletteName}

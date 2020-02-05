@@ -14,6 +14,9 @@ class App extends React.Component {
     this.state = { palettes: [] };
     this.findPalette = this.findPalette.bind(this);
     this.savePalette = this.savePalette.bind(this);
+    
+    this.deletePalette = this.deletePalette.bind(this);
+
   }
   componentDidMount() {
     const palettes =
@@ -40,6 +43,18 @@ class App extends React.Component {
         )
     );
   }
+  deletePalette(id) {
+    this.setState(
+      st => ({
+        palettes: [...st.palettes.filter(pal=> pal.id !== id)]
+      }),
+      () =>
+        window.localStorage.setItem(
+          "fuic-palette",
+          JSON.stringify(this.state.palettes)
+        )
+    );
+  }
   render() {
     return (
       <Switch>
@@ -57,7 +72,7 @@ class App extends React.Component {
         <Route
           exact
           path="/"
-          render={() => <PaletteList palettes={this.state.palettes} />}
+          render={() => <PaletteList deletePalette={this.deletePalette} palettes={this.state.palettes} />}
         />
 
         <Route

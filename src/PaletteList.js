@@ -3,7 +3,6 @@ import MiniPalette from "./MiniPalette";
 import { Link } from "react-router-dom";
 import { withStyles } from "@material-ui/styles";
 import { withRouter } from "react-router-dom";
-
 const styles = {
   root: {
     backgroundColor: "blue",
@@ -58,6 +57,7 @@ class PaletteList extends React.Component {
           <div className={classes.palette}>
             {palettes.map(palette => (
               <MiniPalette
+                deletePalette={this.props.deletePalette}
                 {...palette}
                 handleClick={() => this.openPalette(palette.id)}
               />
