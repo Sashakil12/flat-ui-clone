@@ -5,7 +5,6 @@ import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
@@ -14,10 +13,12 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { ChromePicker } from "react-color";
 import Button from "@material-ui/core/Button";
-import DragColorBox from "./DrgColorBox";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 import SavePaletteDialogue from "./SavePalette";
-const drawerWidth = 500;
+import DragColorList from "./DragColorList";
+import arrayMove from "array-move";
+import randomHex from "random-hex-color";
+const drawerWidth = 400;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -73,17 +74,57 @@ const useStyles = makeStyles(theme => ({
       duration: theme.transitions.duration.enteringScreen
     }),
     marginRight: 0
+  },
+  colorBox: {
+    display: "grid",
+    gridTemplateColumns: "min-content",
+    gridTemplateRows: "min-content"
+  },
+  colorPickerContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  btmBtn: {
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    margin: "20px 0",
+    justifyContent: "space-evenly"
+  },
+  ColorPicker: {
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    margin: "20px 20px",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  upperTop: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  upperbtn:{
+    display: "flex",
+    justifyContent:"space-evenly"
   }
 }));
 
-export default function NewPaletteForm({ savePalette, history }) {
+export default function NewPaletteForm({ palette, savePalette, history }) {
+  console.log(palette);
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [currentColor, setCurrentColor] = React.useState("#000");
-  const [colors, setColors] = React.useState([]);
+  const [colors, setColors] = React.useState([...palette.colors]);
   const [newColorName, setName] = React.useState("");
   const [newPaletteName, setPaletteName] = React.useState("");
+  const [newPaletteEmoji, setPaletteEmoji] = React.useState("");
+
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    setColors([...arrayMove(colors, oldIndex, newIndex)]);
+  };
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -97,27 +138,37 @@ export default function NewPaletteForm({ savePalette, history }) {
   const handleColorChange = color => {
     setCurrentColor(color.hex);
   };
-  const handlePaletteNameInput = value => {
-    setPaletteName(value);
-  };
+  
   const addColor = color => {
     const newColor = { color, name: newColorName };
     setColors([...colors, newColor]);
     setName("");
   };
+  const clearPalette = () => {
+    setColors([]);
+  };
   const handleSave = () => {
+    console.log(newPaletteEmoji);
     const paletteName = newPaletteName;
     const newPalette = {
       paletteName: paletteName,
       id: paletteName.toLowerCase().replace(/ /g, "-"),
-      colors: colors
+      colors: colors,
+      emoji: newPaletteEmoji.native
     };
+    
     savePalette(newPalette);
     history.push("/");
   };
-  const handleDelete = (val) => {
-    setColors([...colors.filter(color=>color.color!==val)])
-  }
+  const handleDelete = val => {
+    setColors([...colors.filter(color => color.color !== val)]);
+  };
+  const addRandomColor = () => {
+    const name = `rand-col-${Math.round(Math.random() * 183)}`;
+    const color = randomHex();
+    const newColor = { name, color };
+    setColors([...colors, newColor]);
+  };
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -134,8 +185,10 @@ export default function NewPaletteForm({ savePalette, history }) {
           </Typography>
           <SavePaletteDialogue
             handleSave={handleSave}
-            paletteNameInput={handlePaletteNameInput}
+            setPaletteName={setPaletteName}
+            setPaletteEmoji={setPaletteEmoji}
             paletteName={newPaletteName}
+            paletteEmoji={newPaletteEmoji}
           />
           <IconButton
             color="inherit"
@@ -154,10 +207,18 @@ export default function NewPaletteForm({ savePalette, history }) {
         })}
       >
         <div className={classes.drawerHeader} />
-
-        {colors.map(col => (
-          <DragColorBox key={`${col}-${Math.random() * 5}`} {...col} handleDelete={handleDelete} />
-        ))}
+        {colors.length < 1 && (
+          <Typography>
+            Select Color from the right drawer and Click ADD COLOR Button
+          </Typography>
+        )}
+        <DragColorList
+          axis="xy"
+          colors={colors}
+          handleDelete={handleDelete}
+          onSortEnd={onSortEnd}
+          distance={3}
+        />
       </main>
       <Drawer
         className={classes.drawer}
@@ -177,39 +238,61 @@ export default function NewPaletteForm({ savePalette, history }) {
             )}
           </IconButton>
         </div>
-        <div>
-          <Typography variant="h4">Build Your Own Palette</Typography>
-          <Button variant="contained" color="secondary">
-            Clear Palette
-          </Button>
-          <Button variant="contained" color="primary">
-            Random Color
-          </Button>
-        </div>
-
-        <ChromePicker
-          color={currentColor}
-          onChange={newColor => handleColorChange(newColor)}
-        />
-        <ValidatorForm onSubmit={() => addColor(currentColor)}>
-          <TextValidator
-            label="Color Name"
-            value={newColorName}
-            onChange={handleNameChange}
-            validators={["required"]}
-            errorMessages={["name is required"]}
-          />
-          <Button
-            variant="contained"
-            color="secondary"
-            type="submit"
-            style={{ backgroundColor: currentColor }}
-          >
-            Add Color
-          </Button>
-        </ValidatorForm>
-
         <Divider />
+
+        <div>
+          <div className={classes.colorPickerContainer}>
+            <div className={classes.upperTop}>
+              <Typography variant="h4">Build Your Own Palette</Typography>
+              <div className={classes.upperbtn}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={clearPalette}
+                >
+                  Clear Palette
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={addRandomColor}
+                  disabled={colors.length > 25 && true}
+                >
+                  {colors.length > 25 ? "Palette Full" : "Random Color"}
+                </Button>
+              </div>
+            </div>
+
+            <div className={classes.ColorPicker}>
+              <ChromePicker
+                color={currentColor}
+                onChange={newColor => handleColorChange(newColor)}
+              />
+            </div>
+            <div className={classes.btmBtn}>
+              <ValidatorForm onSubmit={() => addColor(currentColor)}>
+                <TextValidator
+                  label="Color Name"
+                  value={newColorName}
+                  onChange={handleNameChange}
+                  validators={["required"]}
+                  errorMessages={["name is required"]}
+                />
+              </ValidatorForm>
+              <Button
+                disabled={colors.length > 25 && true}
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{
+                  backgroundColor: colors.length > 25 ? "grey" : currentColor
+                }}
+              >
+                {colors.length > 25 ? "Palette Full" : "Add Color"}
+              </Button>
+            </div>
+          </div>
+        </div>
       </Drawer>
     </div>
   );

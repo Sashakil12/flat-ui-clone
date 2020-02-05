@@ -2,6 +2,7 @@ import React from "react";
 import { withStyles } from "@material-ui/styles";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { SortableElement } from "react-sortable-hoc";
 const styles = {
   root: {
     width: "20%",
@@ -26,17 +27,19 @@ const styles = {
     marginLeft: "1rem"
   }
 };
-function DragColorComp({ color, classes, name, handleDelete }) {
-  return (
-    <div style={{ backgroundColor: color }} className={classes.root}>
-      <p className={classes.name}>{name}</p>
-      <IconButton
-        className={classes.delIcon}
-        onClick={() => handleDelete(color)}
-      >
-        <DeleteIcon />
-      </IconButton>
-    </div>
-  );
-}
+const DragColorComp = SortableElement(
+  ({ color, classes, name, handleDelete }) => {
+    return (
+      <div style={{ backgroundColor: color }} className={classes.root}>
+        <p className={classes.name}>{name}</p>
+        <IconButton
+          className={classes.delIcon}
+          onClick={() => handleDelete(color)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </div>
+    );
+  }
+);
 export default withStyles(styles)(DragColorComp);

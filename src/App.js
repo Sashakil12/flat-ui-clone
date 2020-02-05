@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import Pallette from "./Pallette";
 import SeedColors from "./seedColors";
 import PaletteList from "./PaletteList";
@@ -10,9 +10,18 @@ import NewPaletteForm from "./NewPaletteForm";
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { palettes: SeedColors };
+
+    this.state = { palettes: [] };
     this.findPalette = this.findPalette.bind(this);
     this.savePalette = this.savePalette.bind(this);
+  }
+  componentDidMount() {
+    const palettes =
+      JSON.parse(window.localStorage.getItem("fuic-palette")) || SeedColors;
+    console.log(palettes);
+    this.setState({
+      palettes: [...palettes]
+    });
   }
   findPalette(id) {
     return this.state.palettes.find(pal => {
@@ -20,9 +29,16 @@ class App extends React.Component {
     });
   }
   savePalette(palette) {
-    this.setState(st => ({
-      palettes: [...st.palettes, palette]
-    }));
+    this.setState(
+      st => ({
+        palettes: [...st.palettes, palette]
+      }),
+      () =>
+        window.localStorage.setItem(
+          "fuic-palette",
+          JSON.stringify(this.state.palettes)
+        )
+    );
   }
   render() {
     return (
@@ -31,7 +47,11 @@ class App extends React.Component {
           new
           path="/palette/new"
           render={routeProps => (
-            <NewPaletteForm savePalette={this.savePalette} {...routeProps} />
+            <NewPaletteForm
+              palette={this.state.palettes[0]}
+              savePalette={this.savePalette}
+              {...routeProps}
+            />
           )}
         />
         <Route
